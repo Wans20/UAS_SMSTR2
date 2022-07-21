@@ -19,6 +19,11 @@ else if(isset($_GET['action']) && $_GET['action'] == "edit"){
 	$upnama = $dt['nama_lengkap'];
 	$uppass = $dt['password'];
     $upisactive = $dt['is_active'];
+    // if($dt['is_active']==1){
+    //     $aktif="checked";
+    // }else{
+    //     $aktif="";
+    // }
 	 $proses = "update";
 }
 else if(isset($_GET['action']) && $_GET['action'] == "save"){

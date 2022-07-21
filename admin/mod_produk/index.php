@@ -1,128 +1,235 @@
 <?php
-include 'produk_Ctrl.php';
-if (!isset($_GET['act'])) {
+include_once("produk_Ctrl.php");
+if (!isset($_GET['action'])) {
 ?>
- <div class="container-lg mt-1 ">
-<a href="?modul=mod_produk&act=add" class="btn btn-primary mb-2 sticky-top">Tambah Data</a>
-    <table class="table table-striped table-primary table-bordered border-info">
+    <h3 class="fontheader">Produk Coffee shop</h3>
+	<a href="?modul=mod_produk&action=add" class="btn btn-primary btn-xs mb-1">Tambah Data</a>
+	<table class="table table-bordered">
+		<tr class="table-dark">
+			<th>foto</th>
+			<th>kode produk</th>
+			<th>nama poduk</th>
+			<th>id kategori</th>
+			<th>kategori produk</th>
+			<th>stock</th>
+			<th>harga produk</th>
+			<th>deskripsi</th>
+			<th>Action</th>
+		</tr>
+		<?php
+        $listmhs=mysqli_query($koneksidb,"SELECT a.*,ka.nmkategori from mst_produk a INNER JOIN mst_kategoriproduk ka ON a.idkategori=ka.idkategori");
+		while ($list = mysqli_fetch_array($listmhs)) {
+		?>
         <tr>
-            <th>Nama Kategori</th>
-            <th>Nama Produk</th>
-            <th>Harga</th>
-            <th>stock</th>
-            <th>action</th>
+            <td><img src="../assets/img/<?=$list['gambar']; ?>" width="200px"></td>
+            <td><?=$list['idproduk']; ?></td>
+            <td><?=$list['nmproduk']; ?></td>
+            <td><?=$list['idkategori']; ?></td>
+            <td><?=$list['nmkategori']; ?></td>
+            <td><?=$list['stock']; ?></td>
+            <td><?=$list['harga']; ?></td>
+            <td><?= substr($list['deskripsi'], 0, 200)?></td>
+            <td> 
+                <a href="?modul=mod_produk&action=edit&id=<?=$list['idproduk']; ?>" class="btn btn-primary mb-1">
+                        <i class="bi bi-pencil-square"></i> edit</a>
+                <a href="?modul=mod_produk&action=delete&id=<?=$list['idproduk']; ?>" class="btn btn-danger">
+                        <i class="bi bi-trash"></i> delete</a>
+            </td>
         </tr>
-        <?php
-            $listproduk = mysqli_query($koneksidb, "SELECT kp.nmkategori, p.nmproduk, p.stock, p.harga FROM kategoriproduk kp INNER JOIN mst_produk p ON 
-            kp.idkategori = p.idkategori");
-            foreach ($listproduk as $d) :
-            ?>
-                <tr>
-                    <td><?= $d['nmkategori'] ?></td>
-                    <td><?= $d['nmproduk'] ?></td>
-                    <td><?= $d['harga'] ?></td>
-                    <td><?= $d['stock'] ?></td>
-                    <td>
-                        <a href="?modul=mod_produk&act=edit&id=<?= $d["idkategori"]; ?>" class="btn btn-xs btn-primary"><i class="bi bi-pencil-square"></i> Edit</a>
-                        <a href="?modul=mod_produk&act=delete&id=<?= $d["idkategori"]; ?>" class="btn btn-xs btn-danger"><i class="bi bi-trash"></i> Delete</a>
-                    </td>
-                </tr>
-            <?php
-            endforeach;
-            ?>
-        </table>
-</div>
-<?php
- } else if (isset($_GET['act']) && ($_GET['act'] == "add" || $_GET['act'] == "edit")) {
-?>
-<?php 
- $dt_kategoriproduk = mysqli_query($koneksidb, "select * from kategoriproduk");
- if ($process == "insert"){
-?>
-<div class="container-lg mt-1">
-    <h3 class="mt-1"><?php echo $judul; ?></h3>
-    <div class="row mt-4">
-        <div class="col">
-         <form action="?modul=mod_produk&act=save" id="formproduk" method="POST" enctype="multipart/form-data">
-            <div class="mb-3 row">
-                <label for="nmproduk_ins" class="col-sm-2 col-form-label">Nama Produk</label>
-             <div class="col-sm-6">
-                <input type="hidden" name="idblog" value="<?= $idproduk; ?>">
-                <input type="hidden" name="action" value="<?= $action; ?>">
-                <input type="text" class="form-control" id="nmproduk_ins" value=<?php $nmproduk; ?> name="nmproduk_ins">
-             </div>
-            </div>
-            <div class="mb-3 row">
-                <label for="img_add" class="col-sm-2 col-form-label">Gambar</label>
-                <div class="col-sm-6">
-                    <input type="hidden" name="file_uploaded" value="<?= $gambar; ?>">
-                    <input type="file" class="form-control" id="img_add" name="img_add">
-                </div>
-            </div>
-            <div class="mb-3 row">
-                <label for="idkategori_ins" class="col-sm-2 col-form-label">Kategori</label>
-                <div class="col-sm-6">
-                    <select name="idkategori_ins" id="idkategori_ins" class="form-control">
-                        <option value="" selected disabled>--Pilih Produk--</option>
+        <?php } ?>
+	</table>
+	<?php } else if (isset($_GET['action']) && ($_GET['action'] == "add" || $_GET['action'] == "edit")) {
+                $query_cekkode = mysqli_query($koneksidb,
+                "select idproduk from mst_produk ORDER BY idproduk DESC LIMIT 0,1");
+                   $cekkode = mysqli_fetch_array($query_cekkode);
+                   if(mysqli_num_rows($query_cekkode) == 0 ){
+                    $kodeakhir="AS";
+                }else{
+                    $kodeakhir=$cekkode['idproduk'];  
+                }
+                $no_urutakhir = substr($kodeakhir,6);
+                $th_akhir = substr($kodeakhir,2,4);
+                $th_sekarang = date("Y");
+        
+            if($th_akhir == $th_sekarang){
+                if ($no_urutakhir ==0||$no_urutakhir < 9) {
+                    $nourut_baru = "00" . ($no_urutakhir + 1);
+                } else if ($no_urutakhir >9) {
+                    $nourut_baru = "0" . ($no_urutakhir + 1);
+                } else if ($no_urutakhir < 100) {
+                    $nourut_baru = "0" . ($no_urutakhir + 1);
+                } else {
+                    $nourut_baru = ($no_urutakhir + 1);
+                }
+                // echo "kodenya:" . $nourut_baru . "<br>";
+            } else {
+                $nourut_baru =  "001";
+            }
+            $kodeterbaru = "AS".$th_sekarang . $nourut_baru;
+               $qrykategorialat=mysqli_query($koneksidb,"SELECT * FROM mst_kategoriproduk");
+        if($proses=="insert"){
+    ?>
+	<form action="?modul=mod_produk&action=save" method="POST" enctype="multipart/form-data">
+        <div class="row mb-1">
+			<label class="col-md-3">id produk</label>
+				<div class="col-md-5">
+                    <input type="hidden" name="proses" value="<?= $proses; ?>">
+                    <input type="hidden" name="idkopi" value="<?= $upidalat; ?>">
+					<input type="text" name="idproduk" id="produk" class="form-control" value="<?= $kodeterbaru; ?>" readonly>
+				</div>
+			</div>
+        <div class="row mb-1">
+			<label class="col-md-3">Nama produk</label>
+			<div class="col-md-5">
+				<input type="text" name="nmproduk" id="nmproduk" class="form-control" >
+			</div>
+		</div>
+        <div class="row mb-1">
+                <label class="col-md-3">Kategori produk</label>
+                <div class="col-md-5">
+                    <select name="katkopi" id="katkopi" class="form-control" required>
+                        <option selected disabled>--Pilih Kategori coffee--</option>
                         <?php
-                         foreach ($dt_kategoriproduk as $dt_kp) :
+                        foreach ($qrykategorialat as $j) :
                         ?>
-                         <option value="<?= $dt_kp['idkategori']; ?>"><?= $dt_kp['nmkategori']; ?></option>
+                            <option value="<?= $j['idkategori']; ?>"><?= $j['nmkategori']; ?></option>
                         <?php
                         endforeach;
                         ?>
                     </select>
                 </div>
             </div>
-            <div class="mb-3 row">
-                <label for="harga" class="col-sm-2 col-form-label">Harga</label>
-                <div class="col-sm-6">
-                    <input type="number" class="form-control" id="harga_ins" name="harga_ins">
+		<div class="row mb-1">
+			<label class="col-md-3">Stock</label>
+			<div class="col-md-5">
+				<input type="number" name="stock" id="stock" class="form-control" >
+			</div>
+		</div>
+        <div class="row mb-1">
+			<label class="col-md-3">Harga produk</label>
+			<div class="col-md-5">
+				<input type="text" name="harga" id="harga" class="form-control" >
+			</div>
+		</div>
+        <div class="row mb-1">
+			<label class="col-md-3">Deskripsi</label>
+			<div class="col-md-5">
+				<textarea type="text" name="deskripsi" id="deskripsi" class="form-control"></textarea>
+			</div>
+		</div>
+        <div class="row mb-1">
+			<label class="col-md-3">Foto</label>
+			<div class="col-md-5">
+				<input type="file" name="img" id="img" class="form-control" >
+			</div>
+		</div>
+        <div class="row pt-3">
+                <label class="col-md-3"></label>
+                <div class="col-md-5">
+                    <button type="submit" id="btnsubmit" class="btn btn-success" data-bs-toggle="modal">Simpan</button>
+                    <a href="home.php?modul=mod_produk"><button type="button" class="btn btn-warning">Kembali</button></a>
                 </div>
             </div>
-            <div class="mb-3 row">
-                <label for="harga" class="col-sm-2 col-form-label">stock</label>
-                <div class="col-sm-6">
-                    <input type="number" class="form-control" id="stock_ins" name="stock_ins">
+	</form>
+<?php }else{ ?>
+    <form action="?modul=mod_produk&action=save" id="formalat" method="POST" enctype="multipart/form-data">
+        <?php if($proses=="update"){ ?>
+        <div class="row mb-1">
+			<label class="col-md-3">id produk</label>
+			<div class="col-md-5">
+            <input type="hidden" name="proses" value="<?= $proses; ?>">
+            <input type="hidden" name="idalat" value="<?= $upidalat; ?>">
+				<input type="text" name="idproduk" id="idproduk" class="form-control" value="<?= $upkode;?>" readonly>
+			</div>
+		</div>
+        <?php } ?>
+		<div class="row mb-1">
+			<label class="col-md-3">Nama  produk</label>
+			<div class="col-md-5">
+				<input type="text" name="nmproduk" id="nmproduk" class="form-control" value="<?= $upnmalat;?>">
+			</div>
+		</div>
+		<div class="row mb-1">
+			<label class="col-md-3">Stock</label>
+			<div class="col-md-5">
+				<input type="number" name="stock" id="stock" class="form-control" value="<?= $upstock;?>">
+			</div>
+		</div>
+		<div class="row mb-1">
+			<label class="col-md-3">Harga</label>
+			<div class="col-md-5">
+				<input type="text" name="hrgproduk" id="hrgproduk" class="form-control" value="<?= $upharga;?>">
+			</div>
+		</div>
+        <div class="row mb-1">
+                <label class="col-md-3">Kategori produk</label>
+                <div class="col-md-5">
+                    <select name="katkopi" id="katkopi" class="form-control" required>
+                        <option selected disabled>--Pilih Kategori produk--</option>
+                        <?php
+                        foreach ($qrykategorialat as $k) :
+                            if ($k['idkategori'] === $dt['idkategori']) {
+                                $select = "selected";
+                            } else {
+                                $select = "";
+                            }
+                        ?>
+                            <option value="<?= $k['idkategori']; ?>" <?= $select;?>><?= $k['nmkategori']; ?></option>
+                        <?php
+                        endforeach;
+                        ?>
+                    </select>
                 </div>
             </div>
-            <div class="mb-3 row">
-                <label for="harga" class="col-sm-2 col-form-label">Kondisi</label>
-                <div class="col-sm-6">
-                <select class="form-select form-select-lg mb-3" name="kondisi_ins" id="kondisi_ins" aria-label="size 3 select example">
-                    <option value="" selected disabled>--Pilih Kondisi--</option>
-                    <option value="baru"><?php $kondisi; ?></option>
-                    <option value="bekas"><?php $kondisi; ?></option>
-                </select>
+        <div class="row mb-1">
+			<label class="col-md-3">Deskripsi</label>
+			<div class="col-md-5">
+				<textarea type="text" name="deskripsi" id="deskripsi" class="form-control"><?=$dt['deskripsi']; ?></textarea>
+			</div>
+		</div>
+        <div class="row mb-1">
+			<label class="col-md-3">Foto</label>
+			<div class="col-md-5">
+                <input type="hidden" name="gambarlama" id="gambarlama" value="<?= $dt['gambar'];?>">
+                <?php 
+                    if($dt['gambar'] == ""){
+                ?>
+                    <input type="file" name="img" id="img" class="form-control">
+                <?php 
+                    } else {
+                ?>
+				<input type="file" name="img" id="img" class="form-control" value="<?= $dt['gambar'];?>">
+                <img src="../asset/img/<?= $dt['gambar'];?>" class="img img-thumbnail mt-1" width="200px">
+			<?php
+                }
+            ?>
+            </div>
+		</div>
+        <div class="row pt-3">
+                <label class="col-md-3"></label>
+                <div class="col-md-5">
+                    <button type="button" name="btnsubmit" id="btnsubmit" class="btn btn-primary">Simpan</button>
+                    <a href="home.php?modul=mod_produk"><button type="button" class="btn btn-warning">Kembali</button></a>
                 </div>
             </div>
-            <div class="mb-3 row">
-                <label for="deskripsi" class="col-sm-2 col-form-label">Isi</label>
-                <div class="col-sm-6">
-                    <textarea name="deskripsi" id="deskripsi" cols="30" rows="10"><?= $isi; ?></textarea>
-                </div>
+	</form>
+<?php } ?>
+<!--modal -->
+<div class="modal fade" id="btnkonfirm" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="mb-3 row">
-                <label for="harga" class="col-sm-2 col-form-label">Berat</label>
-                <div class="col-sm-6">
-                    <input type="text" class="form-control" id="berat_ins" name="berat_ins">
-                </div>
+            <div class="modal-body">
+                apakah anda yakin ingin menyimpan?
             </div>
-            <div class="row">
-                <div class="col-md-2"></div>
-                <div class="col-md-10">
-                    <a href="?modul=mod_produk" type="cancel" class="btn btn-secondary"><i class="bi bi-box-arrow-left"></i> Kembali</a>
-                    <button type="cancel" class="btn btn-danger"><i class="bi bi-x-square"></i> Reset</button>
-                    <button type="submit" id="tblsubmit" data-bs-toggle="modal" class="btn btn-primary"><i class="bi bi-save"></i> Submit</button>
-                </div>
+            <div class="modal-footer">
+                <button type="button" name="btnbatal" class="btn btn-primary" data-bs-dismiss="modal">Close</button>
+                <button type="button" name="btnsimpan" id="btnsimpan" class="btn btn-primary">Simpan</button>
             </div>
-         </form>
+            </div>
         </div>
-    </div>
-</div>
-<?php 
- } 
-?>
-<?php
- }
-?>
+        </div>
+<?php } ?>

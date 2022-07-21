@@ -12,7 +12,7 @@
             <th>Action</th>
         </tr>
             <?php
-            $data = mysqli_query($koneksidb, "SELECT * FROM kategoriproduk");
+            $data = mysqli_query($koneksidb, "SELECT * FROM mst_kategoriproduk");
             foreach ($data as $d) :
             ?>
                 <tr>
@@ -85,7 +85,7 @@
 <?php 
  } else if (isset($_GET['action']) && ($_GET['action'] == "edit")){
     $id = $_GET['id'];
-    $qry_edit = mysqli_query($koneksidb, "SELECT * FROM kategoriproduk WHERE idkategori='$id'");
+    $qry_edit = mysqli_query($koneksidb, "SELECT * FROM mst_kategoriproduk WHERE idkategori='$id'");
     foreach ($qry_edit as $q) :
 ?>
  <div class="container-lg mt-1">

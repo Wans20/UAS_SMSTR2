@@ -10,7 +10,7 @@ $qry_menu = mysqli_query($koneksidb, "SELECT * FROM mst_menu");
 while ($row = mysqli_fetch_array($qry_menu)) {
 ?>
 <a href="?modul=<?= $row['link']; ?>" style="text-decoration: none;" class="links1">
-	<li class="list-group-item links rounded-3 mt-1"><?= $row['icon']; ?></i><?= $row["nmmenu"]; ?></li>
+	<li class="list-group-item links rounded-3 mt-1"><?= $row["nmmenu"]; ?></li>
 </a>
 <?php
 }

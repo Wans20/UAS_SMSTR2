@@ -1,105 +1,135 @@
-<?php
-if(isset($_GET['act']) && ($_GET['act']== "add")){
-	//jika ada send variabel act=add, tampil form input/tambah
-	$judul = "Form Input Data";
-	//ini untk isi combo
-	$listkategori = mysqli_query($koneksidb,"select * from mst_kategoriproduk")or die("gagal akses table mst_kategoriproduk ".mysqli_error($koneksidb));
-	$idproduk = 0;
-	$nmproduk= "";		
-	$idkategori = 0;
-    $harga = 0;
-    $stock = 0;
-    $kondisi = "";
-    $deskripsi = "";
-    $berat ="";
-	$action = "insert";
-	$gambar = "";
+<?php 
+security_login();
+
+if(!isset($_GET['action'])){
+	$data_alat = mysqli_query($koneksidb,"select * from mst_produk");
+	//untuk contoh generate kode		
 }
-else if(isset($_GET['act']) && ($_GET['act']== "edit")){
-	//jika ada send variabel act=add, tampil form input/tambah
-	$judul = "Form Edit Data";
-	$idkey = $_GET['id']; //dapat dari URL
-	$listkategori = mysqli_query($koneksidb,
-			"select * from mst_kategoriblog where is_active = 1 order by id_kategori DESC")
-			or die("gagal akses table mst_menu ".mysqli_error($koneksidb));
-	$qdata = mysqli_query($koneksidb,"select m.*, k.nm_kategori from mst_blog m 
-				inner join mst_kategoriblog k on m.id_kategori=k.id_kategori where id_blog=$idkey")
-			or die(mysqli_error($koneksidb));
-	$data = mysqli_fetch_array($qdata);
-	$idblog = $data['id_blog'];
-	$judulblog= $data['judul'];		
-	$idkategori = $data['id_kategori'];
-	$isi = $data['isi'];
-	$tanggal = $data['date_input'];
-	$action = "update";
-	$gambar = $data['gambar'];
+else if(isset($_GET['action']) && $_GET['action'] == "add"){
+	$proses = "insert";
 }
-else if(isset($_GET['act']) && ($_GET['act']== "save")){
-	//jika ada send variabel act=save, ketika proses simpan(insert)
-	/*cek upload file terlebih dahulu */
-	if(!empty($_FILES['filegambar'])){
-		$file = $_FILES['filegambar']; 
-		$target_dir = "../../assets/img/";
+else if(isset($_GET['action']) && $_GET['action'] == "edit"){
+    $ids=$_GET['id'];
+	$qry = mysqli_query($koneksidb,"select * from mst_produk where idproduk='$ids'");
+	$dt = mysqli_fetch_array($qry);
+    $id=$dt['idproduk'];
+	$upidalat = $dt['idproduk'];
+	$idproduk = $dt['idproduk'];
+	$upnmalat = $dt['nmproduk'];
+	// $upkatalat = $dt['id_katalat'];
+	$upstock = $dt['stock'];
+	$upharga = $dt['harga'];
+
+	    $proses = "update";
+}
+else if(isset($_GET['action']) && $_GET['action'] == "save"){
+	$proses = $_POST['proses'];
+if($proses=="insert"){
+    $idproduk = $_POST['idproduk'];
+	$nmproduk = $_POST['nmproduk'];
+	$idkategori = $_POST['katkopi'];
+	$stock = $_POST['stock'];
+	$hrg = $_POST['harga'];
+	$desk = $_POST['deskripsi'];
+    $file = $_FILES['img'];
+		$target_dir = "../assets/img/";
 		$target_file =  $target_dir.basename($file['name']);
-		$type_file =strtolower(pathinfo($file['name'],PATHINFO_EXTENSION));
-		echo $type_file."<br/>";
+		$type_file = strtolower(pathinfo($file['name'],PATHINFO_EXTENSION));
+		// echo $type_file."<br/>";
 		$is_upload = 1;
 		/* cek batas limit file maks.3MB*/
-		if($file['size'] > 5000000){
+		if($file['size'] > 2000000){
 			$is_upload = 0;
-			pesan("File lebih dari 5MB!!");		
+			pesan("File lebih dari 2MB!!");		
 		}
 		/**cek tipe file */
-		if($type_file != "jpg" && $type_file != "png"){
+		if($type_file != "jpg" && $type_file != "png" ){
 			$is_upload = 0;
-			pesan("Tipe file bukan file gambar!!");	
+			pesan("hanya tipe file jpg yang diperbolehkan!!");	
 		}
 		$namafile = "";
 		/**proses upload */
 		if($is_upload == 1){
 			if(move_uploaded_file($file['tmp_name'], $target_file)){
 				$namafile = $file['name'];
+                mysqli_query($koneksidb,"INSERT INTO mst_produk (idproduk,nmproduk,gambar,idkategori,harga,stock,deskripsi) values ('$idproduk','$nmproduk','$namafile','$idkategori','$hrg','$stock','$desk')")or die(mysqli_error($koneksidb));
+	            echo '<meta http-equiv="refresh" content="0; url='.ADMIN_URL.'?modul=mod_produk">';
+             
+            }
+			else if($is_upload == 0){
+				pesan("GAGAL upload file gambar!!");
 			}
-			else{
-				pesan("GAGAL upload file gambar!!");	
-			}
-		}
-	}else{
-		if($_POST['action'] == "update"){
-			$namafile = $_POST['gambar'];
-		}else{
-			$namafile = "";
-		}
-		
-	}
+        }
+    }
+	else if($proses == "update"){
+        if ($_FILES['img']['name'] == "") {
+            $id = $_POST['idproduk'];
+            $nmalat = $_POST['nmalat'];
+            $stock = $_POST['stock'];
+            $hargasewa = $_POST['hargasewa'];
+            $katalat = $_POST['katalat'];
+            $namafile = $_POST['gambarlama'];
+            $desk = $_POST['deskripsi'];
+            mysqli_query($koneksidb, "UPDATE mst_alatsewa SET nm_alat='$nmalat',stock='$stock',hrg_alat='$hargasewa',id_katalat='$katalat',deskripsi='$desk',gambar='$namafile' WHERE id_alat = '$id' ") or die(mysqli_error($koneksidb));
+            echo '<meta http-equiv="refresh" content="0; url=' . ADMIN_URL . '?modul=mod_produk">';
+        } else {
+            $file = $_FILES['img'];
+            $target_dir = "../assets/img/";
+            $target_file =  $target_dir . basename($file['name']);
+            $type_file = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+            // echo $type_file . "<br/>";
+            $is_upload = 1;
+            /* cek batas limit file maks.3MB*/
+            if ($file['size'] > 3000000) {
+                $is_upload = 0;
+                pesan("File lebih dari 3MB!!");
+            }
+            /**cek tipe file */
+            if ($type_file != "jpg" && $type_file != "png") {
+                $is_upload = 0;
+                pesan("hanya tipe file jpg/png yang diperbolehkan!!");
+            }
+            $namafile = "";
+            /**proses upload */
+            if ($is_upload == 1) {
+                if (move_uploaded_file($file['tmp_name'], $target_file)) {
+                    $namafile = $file['name'];
+                    $id = $_POST['idalat'];
+                    $nmalat = $_POST['nmalat'];
+                    $stock = $_POST['stock'];
+                    $hargasewa = $_POST['hargasewa'];
+                    $katalat = $_POST['katalat'];
+                    $desk = $_POST['deskripsi'];
+                    if ($namafile == $_POST['gambarlama']) {
+                        $edit = mysqli_query($koneksidb, "UPDATE mst_alatsewa SET nm_alat='$nmalat',stock='$stock',hrg_alat='$hargasewa',id_katalat='$katalat',deskripsi='$desk',gambar='$namafile' WHERE id_alat = '$id' ") or die(mysqli_error($koneksidb));
+                    } else {
+                        $old = $_POST['gambarlama'];
+                        $edit = mysqli_query($koneksidb, "UPDATE mst_alatsewa SET nm_alat='$nmalat',stock='$stock',hrg_alat='$hargasewa',id_katalat='$katalat',deskripsi='$desk',gambar='$namafile' WHERE id_alat = '$id' ") or die(mysqli_error($koneksidb));
+                        unlink("../asset/img/$old");
+                    }
+                    echo '<meta http-equiv="refresh" content="0; url=' . ADMIN_URL . '?modul=mod_produk">';
+                } else {
+                    pesan("GAGAL upload file gambar!!");
+                }
+            }
+        }
+    }
+	
+}else if(isset($_GET['action']) && $_GET['action'] == "delete"){
+    $id=$_GET['id'];
+    $qalat = mysqli_query($koneksidb,"SELECT gambar FROM mst_alatsewa WHERE id_alat='$id'");
+    $qa = mysqli_fetch_array($qalat);
+    $gambar=$qa['gambar'];
+    mysqli_query($koneksidb,"DELETE FROM mst_alatsewa where id_alat='$id'");
+    unlink("../asset/img/$gambar");
+    echo '<meta http-equiv="refresh" content="0; url='.ADMIN_URL.'?modul=mod_produk">';
 
-	$idblog = $_POST['idblog'];		
-	$idkategori = $_POST['kategori'];
-	$judul = $_POST['judul'];
-	$isi = $_POST['isi'];
-	$tanggal = $_POST['tanggal'];
-	$tglblog = date("Y-m-d", strtotime($tanggal));  
-	$author = $_POST['author'];
-
-	//query untuk simpan
-	if($_POST['action'] == "insert" ){
-		$qinsert = mysqli_query($koneksidb, 
-			"INSERT into mst_blog(judul,id_kategori,isi,author,date_input,gambar) 
-			VALUES('$judul','$idkategori','$isi','$author','$tglblog','$namafile')")
-			or die (mysqli_error($koneksidb));
-		if($qinsert){
-			//ketik proses simpan berhasil
-			header("Location: http://localhost/latihan_webphp/admin/home.php?modul=mod_blog");
-		}
-	}
-	else{
-		$qupdate = mysqli_query($koneksidb, 
-			"UPDATE mst_blog SET judul='$judul' ,id_kategori='$idkategori', isi='$isi', 
-			author='$author', date_input='$tglblog', gambar='$namafile' WHERE id_blog='$idblog'")
-			or die (mysqli_error($koneksidb));
-		if($qupdate){
-			//ketik proses simpan berhasil
-			header("Location: http://localhost/latihan_webphp/admin/home.php?modul=mod_blog");
-		}
-	}
 }
+function pesan($alert)
+{
+    echo '<script language="javascript">';
+    echo 'alert("' . $alert . '")';  //not showing an alert box.
+    echo '</script>';
+    echo '<meta http-equiv="refresh" content="0; url='.ADMIN_URL.'?modul=mod_produk">';
+}
+?>

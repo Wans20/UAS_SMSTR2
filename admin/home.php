@@ -23,9 +23,9 @@ security_login();
 	tinymce.init({
 		selector: 'textarea#deskripsi',
 		plugins: [
-			'a11ychecker', 'advlist', 'advcode', 'advtable', 'autolink', 'checklist', 'export',
+			'advlist', 'autolink',
 			'lists', 'link', 'image', 'charmap', 'preview', 'anchor', 'searchreplace', 'visualblocks',
-			'powerpaste', 'fullscreen', 'formatpainter', 'insertdatetime', 'media', 'table', 'help',
+			'fullscreen', 'insertdatetime', 'media', 'table', 'help',
 			'wordcount'
 		],
 		toolbar: 'undo redo | formatpainter casechange blocks | bold italic backcolor | ' +
@@ -41,13 +41,13 @@ security_login();
 	</style>
 </head>
 
-<body>
-	<nav class="navbar fixed-top navbar-light bg-primary">
+<body class="bg-secondary">
+	<nav class="navbar fixed-top bg-dark">
 		<div class="container-fluid">
 			<a class="navbar-brand text-white">Navbar</a>
 			<form class="d-flex">
 				<input class="form-control me-2" type="text" readonly value="<?= $_SESSION['namauser_log']; ?>">
-				<a href="logout.php" class="btn btn-warning text-white"> Logout</a>
+				<a href="logout.php" class="btn btn-danger text-white"> Logout</a>
 			</form>
 		</div>
 	</nav>

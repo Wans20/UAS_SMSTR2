@@ -15,7 +15,6 @@ if (!isset($_GET['action'])) {
 	$id = $dt['idmenu'];
 	$nmmenu = $dt['nmmenu'];
 	$link = $dt['link'];
-	$icon = $dt['icon'];
 	$proses = "update";
 } else if (isset($_GET['action']) && $_GET['action'] == "save") {
 	$proses = $_POST['proses'];
@@ -23,15 +22,13 @@ if (!isset($_GET['action'])) {
 		$kode = $_POST['kode_menu'];
 		$nmmenu = $_POST['nmmenu'];
 		$link = $_POST['link'];
-		$icon = $_POST['icon'];
-		mysqli_query($koneksidb, "insert into mst_menu(kode_menu,nmmenu,link,icon)values('$kode','$nmmenu','$link','$icon')") or die(mysqli_error($koneksidb));
+		mysqli_query($koneksidb, "insert into mst_menu(kode_menu,nmmenu,link)values('$kode','$nmmenu','$link')") or die(mysqli_error($koneksidb));
 		echo '<meta http-equiv="refresh" content="0; url=' . ADMIN_URL . '?modul=mod_menu">';
 	} else if ($proses == "update") {
 		$id = $_POST['idmenu'];
 		$nmmenu = $_POST['nmmenu'];
 		$link = $_POST['link'];
-		$icon = $_POST['icon'];
-		mysqli_query($koneksidb, "update mst_menu set nmmenu='$nmmenu', link='$link', icon='$icon' where idmenu = $id ") or die(mysqli_error($koneksidb));
+		mysqli_query($koneksidb, "update mst_menu set nmmenu='$nmmenu', link='$link' where idmenu='$id'") or die(mysqli_error($koneksidb));
 		echo '<meta http-equiv="refresh" content="0; url=' . ADMIN_URL . '?modul=mod_menu">';
 	}
 }
