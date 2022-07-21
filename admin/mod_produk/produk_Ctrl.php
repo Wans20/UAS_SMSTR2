@@ -3,7 +3,7 @@ if(isset($_GET['act']) && ($_GET['act']== "add")){
 	//jika ada send variabel act=add, tampil form input/tambah
 	$judul = "Form Input Data";
 	//ini untk isi combo
-	$listkategori = mysqli_query($connect_db,"select * from mst_kategoriproduk")or die("gagal akses table mst_kategoriproduk ".mysqli_error($connect_db));
+	$listkategori = mysqli_query($koneksidb,"select * from mst_kategoriproduk")or die("gagal akses table mst_kategoriproduk ".mysqli_error($koneksidb));
 	$idproduk = 0;
 	$nmproduk= "";		
 	$idkategori = 0;
@@ -19,12 +19,12 @@ else if(isset($_GET['act']) && ($_GET['act']== "edit")){
 	//jika ada send variabel act=add, tampil form input/tambah
 	$judul = "Form Edit Data";
 	$idkey = $_GET['id']; //dapat dari URL
-	$listkategori = mysqli_query($connect_db,
+	$listkategori = mysqli_query($koneksidb,
 			"select * from mst_kategoriblog where is_active = 1 order by id_kategori DESC")
-			or die("gagal akses table mst_menu ".mysqli_error($connect_db));
-	$qdata = mysqli_query($connect_db,"select m.*, k.nm_kategori from mst_blog m 
+			or die("gagal akses table mst_menu ".mysqli_error($koneksidb));
+	$qdata = mysqli_query($koneksidb,"select m.*, k.nm_kategori from mst_blog m 
 				inner join mst_kategoriblog k on m.id_kategori=k.id_kategori where id_blog=$idkey")
-			or die(mysqli_error($connect_db));
+			or die(mysqli_error($koneksidb));
 	$data = mysqli_fetch_array($qdata);
 	$idblog = $data['id_blog'];
 	$judulblog= $data['judul'];		
@@ -83,20 +83,20 @@ else if(isset($_GET['act']) && ($_GET['act']== "save")){
 
 	//query untuk simpan
 	if($_POST['action'] == "insert" ){
-		$qinsert = mysqli_query($connect_db, 
+		$qinsert = mysqli_query($koneksidb, 
 			"INSERT into mst_blog(judul,id_kategori,isi,author,date_input,gambar) 
 			VALUES('$judul','$idkategori','$isi','$author','$tglblog','$namafile')")
-			or die (mysqli_error($connect_db));
+			or die (mysqli_error($koneksidb));
 		if($qinsert){
 			//ketik proses simpan berhasil
 			header("Location: http://localhost/latihan_webphp/admin/home.php?modul=mod_blog");
 		}
 	}
 	else{
-		$qupdate = mysqli_query($connect_db, 
+		$qupdate = mysqli_query($koneksidb, 
 			"UPDATE mst_blog SET judul='$judul' ,id_kategori='$idkategori', isi='$isi', 
 			author='$author', date_input='$tglblog', gambar='$namafile' WHERE id_blog='$idblog'")
-			or die (mysqli_error($connect_db));
+			or die (mysqli_error($koneksidb));
 		if($qupdate){
 			//ketik proses simpan berhasil
 			header("Location: http://localhost/latihan_webphp/admin/home.php?modul=mod_blog");

@@ -9,7 +9,7 @@ include "functionCtrl.php";
 			<div class="kategori-title">Kategori Produk</div>
 			<div class="subkategori">
 			<?php
-            $qry_listkat= mysqli_query($koneksidb,"select * from kategoriproduk order by idkategori DESC")or die("gagal akses tabel kategoriproduk".mysqli_error($connect_db));
+            $qry_listkat= mysqli_query($koneksidb,"select * from kategoriproduk order by idkategori DESC")or die("gagal akses tabel kategoriproduk".mysqli_error($koneksidb));
             while($row = mysqli_fetch_array($qry_listkat)){
             ?>
             <div class="subkategori" id=""> 

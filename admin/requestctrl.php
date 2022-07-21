@@ -23,7 +23,7 @@ if (isset($_GET['act']) && ($_GET['act']== "edit")){
 				$qinsert = mysqli_query($koneksidb,"UPDATE mst_userlogin SET password='$pass' WHERE username='$username'")
                  or die (mysqli_error($koneksidb));
                  if($qinsert){
-                      $qdelete = mysqli_query($koneksidb,"DELETE from tst_request where id_request=$idrequest")or die(mysqli_error($connect_db));
+                      $qdelete = mysqli_query($koneksidb,"DELETE from tst_request where id_request=$idrequest")or die(mysqli_error($koneksidb));
                  header("Location: http://localhost/latihanweb_ecomm/admin/home.php");
               }
 			}
